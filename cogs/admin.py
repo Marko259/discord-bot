@@ -1,5 +1,7 @@
+import imp
 import os
 import datetime
+import discord
 
 from discord.ext import commands
 from discord_slash import cog_ext, SlashContext
@@ -65,7 +67,6 @@ class AdminCog(commands.Cog):
             await ctx.send(f'**`SUCCESS`**')
 
     @cog_ext.cog_slash(name="ping", guild_ids=guilds_id, description='Pong!')
-    @commands.has_any_role(*staff_roles())
     async def ping(self, ctx):
         """
         Command which pings the bot.
@@ -94,6 +95,105 @@ class AdminCog(commands.Cog):
                 await ctx.send(exception)
         else:
             await ctx.author.send('Command is disabled because debug is not enabled.')
+
+    @cog_ext.cog_slash(name="disconnect", guild_ids=guilds_id, description='Disconnects a user.')
+    @commands.has_any_role(*staff_roles())
+    async def disconnect(self, ctx, member: discord.Member = None):
+        """
+        Disconnects a user.
+        :param ctx:
+        :param member:
+        :return None:
+        :raise Exception:
+        """
+        try:
+            if member is None:
+                member = ctx.author
+
+            await member.move_to(None)
+            await member.send(f'You have been disconnected By - `{ctx.author.display_name}`')
+            await ctx.author.send(f'`{member.display_name}` has been disconnected.')
+        except Exception as e:
+            await ctx.author.send(f'**`ERROR:`** {type(e).__name__} - {e}')
+
+    @cog_ext.cog_slash(name="mute", guild_ids=guilds_id, description='Bans a user.')
+    @commands.has_any_role(*staff_roles())
+    async def mute(self, ctx, member: discord.Member = None):
+        """
+        Mutes a user.
+        :param ctx:
+        :param member:
+        :return None:
+        :raise Exception:
+        """
+        try:
+            if member is None:
+                member = ctx.author
+            await member.edit(mute=True)
+            await member.send(f'You have been muted By - `{ctx.author.display_name}`')
+            await ctx.author.send(f'`{member.display_name}` has been muted.')
+        except Exception as e:
+            await ctx.author.send(f'**`ERROR:`** {type(e).__name__} - {e}')
+
+    @cog_ext.cog_slash(name="unmute", guild_ids=guilds_id, description='Unmutes a user.')
+    @commands.has_any_role(*staff_roles())
+    async def unmute(self, ctx, member: discord.Member = None):
+        """
+        Unmutes a user.
+        :param ctx:
+        :param member:
+        :return None:
+        :raise Exception:
+        """
+        try:
+            if member is None:
+                member = ctx.author
+            await member.edit(mute=False)
+            await member.send(f'You have been unmuted By - `{ctx.author.display_name}`')
+            await ctx.author.send(f'`{member.display_name}` has been unmuted.')
+        except Exception as e:
+            await ctx.author.send(f'**`ERROR:`** {type(e).__name__} - {e}')
+
+    @cog_ext.cog_slash(name="deafen", guild_ids=guilds_id, description='deafens a user.')
+    @commands.has_any_role(*staff_roles())
+    async def deafen(self, ctx, member: discord.Member = None, mute: bool = False):
+        """
+        Deafens a user.
+        :param ctx:
+        :param member:
+        :return None:
+        :raise Exception:
+        """
+        try:
+            if member is None:
+                member = ctx.author
+            await member.edit(deafen=True)
+            if mute:
+                await member.edit(mute=True)
+            await member.send(f'You have been deafened By - `{ctx.author.display_name}`')
+            await ctx.author.send(f'`{member.display_name}` has been deafened.')
+        except Exception as e:
+            await ctx.author.send(f'**`ERROR:`** {type(e).__name__} - {e}')
+
+    @cog_ext.cog_slash(name="undeafen", guild_ids=guilds_id, description='undeafens a user.')
+    @commands.has_any_role(*staff_roles())
+    async def undeafen(self, ctx, member: discord.Member = None, mute: bool = False):
+        """
+        Undeafens a user.
+        :param ctx:
+        :param member:
+        :return None:
+        :raise Exception:
+        """
+        try:
+            if member is None:
+                member = ctx.author
+            await member.edit(deafen=False)
+            await member.edit(mute=False)
+            await member.send(f'You have been undeafened By - `{ctx.author.display_name}`')
+            await ctx.author.send(f'`{member.display_name}` has been undeafened.')
+        except Exception as e:
+            await ctx.author.send(f'**`ERROR:`** {type(e).__name__} - {e}')
 
 def setup(bot):
     bot.add_cog(AdminCog(bot))

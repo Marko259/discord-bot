@@ -4,7 +4,7 @@ from discord_slash import SlashCommand
 from discord.ext import commands
 from dotenv import load_dotenv
 from helpers import config
-from helpers.config import BOT_TOKEN
+from helpers.config import BOT_TOKEN, PATTE
 
 load_dotenv('.env')
 
@@ -24,6 +24,11 @@ async def on_ready() -> None:
     except InvalidArgument as e:
         print(f'Error changing presence. Exception - {e}')
 
+@bot.event
+async def on_message(message) -> None:
+    if '@' in message.content:
+        await message.channel.send(PATTE)
+        
 @bot.event
 async def on_connect():
     config.load_cogs(bot)
