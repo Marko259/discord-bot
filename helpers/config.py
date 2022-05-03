@@ -7,6 +7,7 @@ load_dotenv('.env')
 
 DESCRIPTION = 'A Discord bot that allows you to manage your server.'
 PRESENCE_TEXT = 'You sleep'
+PENIS_COLOR = 0xeb4034
 
 COGS = [
     'cogs.admin',
@@ -29,14 +30,17 @@ NORMAL_ROLES = [
 ]
 
 DEBUG = bool(strtobool(str(os.getenv('DEBUG', 'False'))))
-
 BOT_TOKEN = str(os.getenv('BOT_TOKEN'))
-
 GUILD_ID = int(os.getenv('GUILD_ID'))
-
 PATRICK_ID = int(os.getenv('PATRICK_ID'))
-
 PATTE = '<@' + str(PATRICK_ID) + '>'
+
+SKAMME = int(os.getenv('SKAMME'))
+
+BOT_DB_HOST = str(os.getenv('BOT_DB_HOST'))
+BOT_DB_USER = str(os.getenv('BOT_DB_USER'))
+BOT_DB_PASSWORD = str(os.getenv('BOT_DB_PASSWORD'))
+BOT_DB_NAME = str(os.getenv('BOT_DB_NAME'))
 
 def activity() -> discord.Activity:
     return discord.Activity(name=PRESENCE_TEXT, type=discord.ActivityType.watching)

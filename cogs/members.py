@@ -1,3 +1,5 @@
+from datetime import datetime
+from time import sleep
 import youtube_dl
 
 import discord
@@ -5,6 +7,8 @@ from helpers.config import GUILD_ID
 from discord.ext import commands, tasks
 from discord_slash import cog_ext
 from helpers.youtube import Youtube
+from helpers.message import embed
+from helpers.database import db_connection
 
 class MembersCog(commands.Cog):
 
@@ -99,26 +103,31 @@ class MembersCog(commands.Cog):
             await voice_client.disconnect()
 
     @cog_ext.cog_slash(name='vote2kick', guild_ids=guilds_id, description='Votes to kick a member')
-    async def vote2kick(self, ctx, member: discord.Member):
+    async def vote2kick(self, ctx, member: discord.Member, reason: str = False):
         """
         Command which votes to kick a member.
         """
-        if member.id == ctx.author.id:
-            await ctx.send('You cannot vote to kick yourself.')
-            return
-        if member.id == self.bot.user.id:
-            await ctx.send('You cannot vote to kick me.')
-            return
-        if member.id in self.bot.config.get('voted_to_kick'):
-            await ctx.send(f'You have already voted to kick {member.mention}.')
-            return
-        self.bot.config.set('voted_to_kick', member.id)
-        await ctx.send(f'You have voted to kick {member.mention}.')
-
-        if len(self.bot.config.get('voted_to_kick')) >= 3:
-            await ctx.send('**Vote to kick has ended.**')
-            self.bot.config.set('voted_to_kick', [])
-            await member.move_to()
+        try:
+            await ctx.send("Message is being generated", delete_after=5)
+            mydb = db_connection()
+            cursor = mydb.cursor()
+            now = datetime.now()
+            timestamp = now.strftime("%d/%m/%Y %H:%M:%S")
+            footer = f"{ctx.author.display_name} has started a vote | {timestamp}"
+            cursor.execute(f"SELECT * FROM vote2kick WHERE guild_id = {ctx.guild.id} AND member_user_id = {member.id}")
+            if cursor.fetchone():
+                await ctx.send(f"{member.mention} has already been voted to be kicked.")
+                return
+            async with ctx.channel.typing():
+                sleep(2)
+            msg = embed(description=reason, title=f"{member.display_name} has been voted to be kicked", User=member.id, author=ctx.author.display_name, avatar_url=ctx.author.avatar_url, footer=footer)
+            message = await ctx.send(embed=msg)
+            cursor.execute('INSERT into vote2kick (author_user_id, member_user_id, message_id, guild_id, reason, created_at) VALUES (%s, %s, %s, %s, %s, %s)', (ctx.author.id, member.id, message.id, ctx.guild.id, reason, now.strftime("%Y/%m/%d %H:%M:%S")))
+            mydb.commit()
+            #await message.add_reaction("✅")
+        except Exception as e:
+            await ctx.send(f'**`ERROR:`** {type(e).__name__} - {e}')
+        
 
 def setup(bot):
     bot.add_cog(MembersCog(bot))
