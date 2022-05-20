@@ -12,11 +12,13 @@ PENIS_COLOR = 0xeb4034
 COGS = [
     'cogs.admin',
     'cogs.members',
+    'cogs.music'
 ]
 
 COGS_LOAD = {
     'admin': 'cogs.admin',
     'members': 'cogs.members',
+    'music': 'cogs.music'
 }
 
 STAFF_ROLES = [
@@ -41,6 +43,8 @@ BOT_DB_HOST = str(os.getenv('BOT_DB_HOST'))
 BOT_DB_USER = str(os.getenv('BOT_DB_USER'))
 BOT_DB_PASSWORD = str(os.getenv('BOT_DB_PASSWORD'))
 BOT_DB_NAME = str(os.getenv('BOT_DB_NAME'))
+
+LYRICS_URL = str(os.getenv('LYRICS_URL'))
 
 def activity() -> discord.Activity:
     return discord.Activity(name=PRESENCE_TEXT, type=discord.ActivityType.watching)

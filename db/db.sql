@@ -10,3 +10,9 @@ CREATE TABLE `vote2kick` (
     PRIMARY KEY (`id`),
     UNIQUE KEY `id` (`id`) USING BTREE
 );
+
+CREATE TABLE `queue` (
+    `id` int(11) NOT NULL AUTO_INCREMENT,
+    `user_id` int(11) NOT NULL,
+
+)

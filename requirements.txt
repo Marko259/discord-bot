@@ -6,3 +6,5 @@ python-dotenv==0.19.2
 python-version==0.0.2
 markdownify==0.10.1
 youtube_dl==2021.12.17
+lavalink==3.1.5
+Wavelink==0.9.10
